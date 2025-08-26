@@ -1,6 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenAI(process.env.GEMINI_API_KEY || "");
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export interface AnalysisResult {
   answer: string;

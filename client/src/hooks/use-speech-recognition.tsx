@@ -66,7 +66,8 @@ export function useSpeechRecognition() {
       return response.json();
     },
     onSuccess: (data) => {
-      if (data.enhancedText && data.enhancedText !== transcript) {
+      // Only update if enhancement is significantly different and better
+      if (data.enhancedText && data.enhancedText !== transcript && data.confidence > 0.7) {
         setTranscript(data.enhancedText);
         updateWordCount(data.enhancedText);
       }
@@ -146,31 +147,34 @@ export function useSpeechRecognition() {
         }
       }
       
-      // Always preserve the existing transcript and only add new content
       setTranscript(prevTranscript => {
-        let newTranscript = prevTranscript;
-        
-        // Add final transcript if there's new content
+        // Only add final transcript to the permanent transcript
         if (finalTranscript.trim()) {
-          newTranscript = prevTranscript + (prevTranscript ? ' ' : '') + finalTranscript;
+          const newPermanentTranscript = prevTranscript + (prevTranscript && !prevTranscript.endsWith(' ') ? ' ' : '') + finalTranscript;
+          
+          // Show permanent + interim for display
+          const displayTranscript = newPermanentTranscript + (interimTranscript ? (newPermanentTranscript && !newPermanentTranscript.endsWith(' ') ? ' ' : '') + interimTranscript : '');
+          
+          updateWordCount(displayTranscript);
+          
+          // Use AI for language detection only once per final result
+          if (finalTranscript.trim()) {
+            detectLanguage(finalTranscript);
+            
+            // Enhanced mode: improve text with AI
+            if (enhancedMode && newPermanentTranscript.length > 20) {
+              enhanceText({ text: newPermanentTranscript, targetLanguage: currentLanguage });
+            }
+          }
+          
+          return displayTranscript;
+        } else {
+          // Just show interim results without changing permanent transcript
+          const displayTranscript = prevTranscript + (interimTranscript ? (prevTranscript && !prevTranscript.endsWith(' ') ? ' ' : '') + interimTranscript : '');
+          updateWordCount(displayTranscript);
+          return displayTranscript;
         }
-        
-        // For interim results, show them temporarily but don't persist
-        const displayTranscript = newTranscript + (interimTranscript ? ' ' + interimTranscript : '');
-        
-        updateWordCount(displayTranscript);
-        return displayTranscript;
       });
-      
-      if (finalTranscript) {
-        // Use AI for language detection
-        detectLanguage(finalTranscript);
-        
-        // Enhanced mode: improve text with AI
-        if (enhancedMode && finalTranscript.length > 20) {
-          enhanceText({ text: finalTranscript, targetLanguage: currentLanguage });
-        }
-      }
     };
     
     recognition.onerror = (event: any) => {
