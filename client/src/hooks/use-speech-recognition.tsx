@@ -137,6 +137,7 @@ export function useSpeechRecognition() {
       let finalTranscript = '';
       let interimTranscript = '';
       
+      // Only process the latest result to avoid accumulating old results
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcriptPart = event.results[i][0].transcript;
         
@@ -147,42 +148,27 @@ export function useSpeechRecognition() {
         }
       }
       
-      setTranscript(prevTranscript => {
-        if (finalTranscript.trim()) {
-          // Add only new final transcript, avoiding duplication
+      // Only update transcript when we have a final result
+      if (finalTranscript.trim()) {
+        setTranscript(prevTranscript => {
           const newText = finalTranscript.trim();
-          const currentText = prevTranscript.trim();
           
-          // Check if this text is already at the end to avoid duplication
-          if (!currentText.endsWith(newText)) {
-            const newPermanentTranscript = currentText + (currentText ? ' ' : '') + newText;
-            
-            // Use AI for language detection only once per final result
-            detectLanguage(newText);
-            
-            // Enhanced mode: improve text with AI (but don't replace, just analyze)
-            if (enhancedMode && newText.length > 10) {
-              // Only use AI for enhancement if it's a substantial addition
-              enhanceText({ text: newText, targetLanguage: currentLanguage });
-            }
-            
-            updateWordCount(newPermanentTranscript);
-            return newPermanentTranscript;
+          // Simply add the new final text without complex checking
+          const updatedTranscript = prevTranscript + (prevTranscript ? ' ' : '') + newText;
+          
+          // Use AI for language detection only once per final result
+          detectLanguage(newText);
+          
+          // Enhanced mode: improve text with AI (but don't replace, just analyze)
+          if (enhancedMode && newText.length > 10) {
+            enhanceText({ text: newText, targetLanguage: currentLanguage });
           }
           
-          // If text already exists, just update word count and return current
-          updateWordCount(currentText);
-          return currentText;
-        } else if (interimTranscript.trim()) {
-          // Show interim results temporarily (but don't save them)
-          const displayText = prevTranscript + (prevTranscript ? ' ' : '') + interimTranscript;
-          updateWordCount(displayText);
-          return displayText;
-        }
-        
-        // No changes, return previous transcript
-        return prevTranscript;
-      });
+          updateWordCount(updatedTranscript);
+          return updatedTranscript;
+        });
+      }
+      // Don't show interim results to avoid confusion and duplication
     };
     
     recognition.onerror = (event: any) => {
