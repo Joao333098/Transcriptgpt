@@ -233,6 +233,42 @@
     transform: translateY(-5px);
     box-shadow: var(--shadow-large);
   }
+
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .bg-gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+
+  .bg-gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .bg-gradient-warning {
+    background: var(--gradient-warning);
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
 }
 
 @keyframes pulse-soft {

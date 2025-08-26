@@ -311,6 +311,11 @@ export function useSpeechRecognition() {
     languageCount,
     startRecording,
     stopRecording,
-    clearTranscript
+    clearTranscript,
+    switchLanguage,
+    toggleEnhancedMode,
+    currentLanguage,
+    enhancedMode,
+    detectedLanguages
   };
 }

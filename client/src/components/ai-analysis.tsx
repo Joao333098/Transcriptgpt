@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Send, ThumbsUp, Copy, Brain, Search } from "lucide-react";
+import { Send, ThumbsUp, Copy, Brain, Search, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAiAnalysis } from "@/hooks/use-ai-analysis";
+import { useAiAnalysis, useSentimentAnalysis } from "@/hooks/use-ai-analysis";
 import { useToast } from "@/hooks/use-toast";
 
 interface AiAnalysisProps {
@@ -21,6 +21,7 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
   const [question, setQuestion] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [lastAnalysis, setLastAnalysis] = useState<AnalysisResult | null>(null);
+  const [sentimentData, setSentimentData] = useState<any>(null);
   const { toast } = useToast();
   
   const { mutate: analyzeContent, isPending: isAnalyzing } = useAiAnalysis({
@@ -32,6 +33,19 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
       toast({
         title: "Erro",
         description: error.message || "Falha na análise de IA",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const { mutate: analyzeSentiment, isPending: isAnalyzingSentiment } = useSentimentAnalysis({
+    onSuccess: (data) => {
+      setSentimentData(data);
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha na análise de sentimento",
         variant: "destructive",
       });
     }
@@ -81,13 +95,57 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
   return (
     <div className="space-y-6">
       
+      {/* Sentiment Analysis */}
+      {transcript && (
+        <div className="glass-card rounded-3xl shadow-large p-6 border-white/20 hover-lift">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-secondary rounded-lg flex items-center justify-center">
+                <TrendingUp className="text-white text-sm" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Análise de Sentimento</h3>
+            </div>
+            <Button
+              onClick={() => analyzeSentiment(transcript)}
+              disabled={isAnalyzingSentiment}
+              className="bg-gradient-secondary hover:scale-105 transition-all duration-300"
+              size="sm"
+            >
+              {isAnalyzingSentiment ? "Analisando..." : "Analisar"}
+            </Button>
+          </div>
+          
+          {sentimentData && (
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center p-4 glass-card rounded-xl border-white/20">
+                <div className="text-2xl font-bold text-white mb-1">{sentimentData.rating}/5</div>
+                <div className="text-xs text-white/70">Avaliação</div>
+              </div>
+              <div className="text-center p-4 glass-card rounded-xl border-white/20">
+                <div className="text-2xl font-bold text-white mb-1">{Math.round(sentimentData.confidence * 100)}%</div>
+                <div className="text-xs text-white/70">Confiança</div>
+              </div>
+              <div className="text-center p-4 glass-card rounded-xl border-white/20">
+                <div className={`text-lg font-bold mb-1 ${
+                  sentimentData.sentiment === 'positivo' ? 'text-green-300' :
+                  sentimentData.sentiment === 'negativo' ? 'text-red-300' : 'text-yellow-300'
+                }`}>
+                  {sentimentData.sentiment}
+                </div>
+                <div className="text-xs text-white/70">Sentimento</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* AI Question Interface */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+      <div className="glass-card rounded-3xl shadow-large p-6 border-white/20 hover-lift">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center animate-glow">
             <Brain className="text-white text-sm" />
           </div>
-          <h3 className="text-xl font-bold text-dark">Análise Inteligente</h3>
+          <h3 className="text-xl font-bold text-white drop-shadow-lg">Análise Inteligente com Gemini</h3>
         </div>
 
         <div className="space-y-4">
@@ -98,16 +156,17 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
               onChange={(e) => setQuestion(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Faça uma pergunta sobre o conteúdo transcrito..."
-              className="flex-1"
+              className="flex-1 bg-white/20 border-white/30 text-white placeholder:text-white/60"
               disabled={isAnalyzing || !transcript}
             />
             <Button
               data-testid="button-submit-question"
               onClick={handleSubmitQuestion}
               disabled={isAnalyzing || !question.trim() || !transcript}
+              className="bg-gradient-accent hover:scale-105 transition-all duration-300"
             >
               {isAnalyzing ? (
-                <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <Send className="w-4 h-4" />
               )}
@@ -116,17 +175,17 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
 
           {/* AI Response Area */}
           {lastAnalysis && (
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 animate-fade-in">
+            <div className="glass-card rounded-2xl p-6 border-white/20 animate-fade-in shadow-glow">
               <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center flex-shrink-0 animate-glow">
                   <Brain className="text-white text-sm" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-dark font-medium mb-2">Resposta da IA:</p>
-                  <p data-testid="text-ai-response" className="text-dark-light leading-relaxed text-sm mb-2">
+                  <p className="text-white font-medium mb-2">Resposta do Gemini:</p>
+                  <p data-testid="text-ai-response" className="text-white/90 leading-relaxed text-sm mb-2">
                     {lastAnalysis.answer}
                   </p>
-                  <div className="text-xs text-muted mb-4">
+                  <div className="text-xs text-white/70 mb-4">
                     Confiança: {Math.round(lastAnalysis.confidence * 100)}%
                   </div>
                   
@@ -137,7 +196,7 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
                         {lastAnalysis.relatedTopics.map((topic, index) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs"
+                            className="px-3 py-1 bg-white/20 text-white rounded-full text-xs border border-white/30"
                           >
                             {topic}
                           </span>
@@ -149,7 +208,7 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
                   <div className="flex items-center space-x-4">
                     <button
                       data-testid="button-thumbs-up"
-                      className="text-xs text-primary hover:text-secondary transition-colors duration-200 flex items-center space-x-1"
+                      className="text-xs text-white/80 hover:text-white transition-all duration-200 flex items-center space-x-1 hover:scale-105"
                     >
                       <ThumbsUp className="w-3 h-3" />
                       <span>Útil</span>
@@ -157,7 +216,7 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
                     <button
                       data-testid="button-copy-response"
                       onClick={handleCopyResponse}
-                      className="text-xs text-muted hover:text-dark-light transition-colors duration-200 flex items-center space-x-1"
+                      className="text-xs text-white/80 hover:text-white transition-all duration-200 flex items-center space-x-1 hover:scale-105"
                     >
                       <Copy className="w-3 h-3" />
                       <span>Copiar</span>
@@ -171,12 +230,12 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
       </div>
 
       {/* Content Search */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+      <div className="glass-card rounded-3xl shadow-large p-6 border-white/20 hover-lift">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-8 h-8 bg-gradient-to-r from-accent to-secondary rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-gradient-accent rounded-lg flex items-center justify-center">
             <Search className="text-white text-sm" />
           </div>
-          <h3 className="text-xl font-bold text-dark">Buscar no Conteúdo</h3>
+          <h3 className="text-xl font-bold text-white drop-shadow-lg">Buscar no Conteúdo</h3>
         </div>
 
         <div className="relative mb-4">
@@ -185,7 +244,7 @@ export default function AiAnalysis({ transcript, currentSessionId }: AiAnalysisP
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar palavras ou frases na transcrição..."
-            className="pl-10"
+            className="pl-10 bg-white/20 border-white/30 text-white placeholder:text-white/60"
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
         </div>

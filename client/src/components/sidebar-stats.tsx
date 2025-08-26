@@ -123,49 +123,49 @@ export default function SidebarStats({
     <div className="space-y-6">
       
       {/* Statistics Cards */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-dark mb-6">Estatísticas da Sessão</h3>
+      <div className="glass-card rounded-3xl shadow-large border-white/20 p-6 hover-lift">
+        <h3 className="text-lg font-bold text-white mb-6 drop-shadow-lg">Estatísticas da Sessão</h3>
         
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl">
+          <div className="flex items-center justify-between p-4 glass-card border-white/20 rounded-xl">
             <div>
-              <p className="text-sm text-muted">Tempo de Gravação</p>
-              <p data-testid="text-recording-time" className="text-xl font-bold text-dark">
+              <p className="text-sm text-white/70">Tempo de Gravação</p>
+              <p data-testid="text-recording-time" className="text-xl font-bold text-white">
                 {formatTime(recordingTime)}
               </p>
             </div>
-            <Clock className="text-primary text-xl" />
+            <Clock className="text-blue-300 text-xl" />
           </div>
           
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-accent/10 to-secondary/10 rounded-xl">
+          <div className="flex items-center justify-between p-4 glass-card border-white/20 rounded-xl">
             <div>
-              <p className="text-sm text-muted">Palavras Transcritas</p>
-              <p data-testid="text-word-count" className="text-xl font-bold text-dark">
+              <p className="text-sm text-white/70">Palavras Transcritas</p>
+              <p data-testid="text-word-count" className="text-xl font-bold text-white">
                 {wordCount}
               </p>
             </div>
-            <Type className="text-accent text-xl" />
+            <Type className="text-green-300 text-xl" />
           </div>
           
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-warning/10 to-accent/10 rounded-xl">
+          <div className="flex items-center justify-between p-4 glass-card border-white/20 rounded-xl">
             <div>
-              <p className="text-sm text-muted">Idiomas Detectados</p>
-              <p data-testid="text-language-count" className="text-xl font-bold text-dark">
+              <p className="text-sm text-white/70">Idiomas Detectados</p>
+              <p data-testid="text-language-count" className="text-xl font-bold text-white">
                 {languageCount}
               </p>
             </div>
-            <Globe className="text-warning text-xl" />
+            <Globe className="text-yellow-300 text-xl" />
           </div>
         </div>
       </div>
 
       {/* Language Settings */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-dark mb-6">Configurações de Idioma</h3>
+      <div className="glass-card rounded-3xl shadow-large border-white/20 p-6 hover-lift">
+        <h3 className="text-lg font-bold text-white mb-6 drop-shadow-lg">Configurações de Idioma</h3>
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-dark mb-2">Idiomas Preferidos</label>
+            <label className="block text-sm font-medium text-white mb-2">Idiomas Preferidos</label>
             <div className="space-y-2">
               <label className="flex items-center space-x-3">
                 <Checkbox
@@ -175,7 +175,7 @@ export default function SidebarStats({
                     setPreferredLanguages(prev => ({ ...prev, 'pt-BR': !!checked }))
                   }
                 />
-                <span className="text-sm text-dark-light">Português (BR)</span>
+                <span className="text-sm text-white/80">Português (BR)</span>
               </label>
               <label className="flex items-center space-x-3">
                 <Checkbox
@@ -185,7 +185,7 @@ export default function SidebarStats({
                     setPreferredLanguages(prev => ({ ...prev, 'en-US': !!checked }))
                   }
                 />
-                <span className="text-sm text-dark-light">English (US)</span>
+                <span className="text-sm text-white/80">English (US)</span>
               </label>
               <label className="flex items-center space-x-3">
                 <Checkbox
@@ -195,13 +195,13 @@ export default function SidebarStats({
                     setPreferredLanguages(prev => ({ ...prev, 'es-ES': !!checked }))
                   }
                 />
-                <span className="text-sm text-dark-light">Español (ES)</span>
+                <span className="text-sm text-white/80">Español (ES)</span>
               </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-dark mb-2">Modo de Detecção</label>
+            <label className="block text-sm font-medium text-white mb-2">Modo de Detecção</label>
             <Select value={detectionMode} onValueChange={setDetectionMode}>
               <SelectTrigger data-testid="select-detection-mode">
                 <SelectValue placeholder="Selecione o modo" />
@@ -217,22 +217,22 @@ export default function SidebarStats({
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-dark mb-6">Ações Rápidas</h3>
+      <div className="glass-card rounded-3xl shadow-large border-white/20 p-6 hover-lift">
+        <h3 className="text-lg font-bold text-white mb-6 drop-shadow-lg">Ações Rápidas</h3>
         
         <div className="space-y-3">
           <Button
             data-testid="button-generate-summary"
             onClick={() => generateSummary()}
             disabled={isGeneratingSummary || !transcript}
-            className="w-full justify-between bg-gradient-to-r from-primary/5 to-secondary/5 hover:from-primary/10 hover:to-secondary/10 text-dark border border-gray-200"
+            className="w-full justify-between bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:scale-105 transition-all duration-300"
             variant="outline"
           >
             <div className="flex items-center space-x-3">
               {isGeneratingSummary ? (
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               ) : (
-                <FileText className="w-4 h-4 text-primary" />
+                <FileText className="w-4 h-4 text-blue-300" />
               )}
               <span>Gerar Resumo</span>
             </div>
@@ -242,11 +242,11 @@ export default function SidebarStats({
             data-testid="button-export-text"
             onClick={handleExportText}
             disabled={!transcript}
-            className="w-full justify-between bg-gradient-to-r from-accent/5 to-secondary/5 hover:from-accent/10 hover:to-secondary/10 text-dark border border-gray-200"
+            className="w-full justify-between bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:scale-105 transition-all duration-300"
             variant="outline"
           >
             <div className="flex items-center space-x-3">
-              <Download className="w-4 h-4 text-accent" />
+              <Download className="w-4 h-4 text-green-300" />
               <span>Exportar Texto</span>
             </div>
           </Button>
@@ -255,11 +255,11 @@ export default function SidebarStats({
             data-testid="button-share-transcription"
             onClick={handleShare}
             disabled={!transcript}
-            className="w-full justify-between bg-gradient-to-r from-warning/5 to-accent/5 hover:from-warning/10 hover:to-accent/10 text-dark border border-gray-200"
+            className="w-full justify-between bg-white/10 hover:bg-white/20 text-white border border-white/30 hover:scale-105 transition-all duration-300"
             variant="outline"
           >
             <div className="flex items-center space-x-3">
-              <Share className="w-4 h-4 text-warning" />
+              <Share className="w-4 h-4 text-yellow-300" />
               <span>Compartilhar</span>
             </div>
           </Button>

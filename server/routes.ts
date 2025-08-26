@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertTranscriptionSessionSchema, insertAiAnalysisSchema } from "@shared/schema";
-import { analyzeTranscriptionContent, generateSummary, detectLanguageFromText, enhanceTranscriptionText } from "./services/openai";
+import { analyzeTranscriptionContent, generateSummary, detectLanguageFromText, enhanceTranscriptionText, analyzeSentiment } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -127,6 +127,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(enhancement);
     } catch (error) {
       res.status(500).json({ message: error.message || "Falha no aprimoramento do texto" });
+    }
+  });
+
+  // Analyze sentiment
+  app.post("/api/ai/sentiment", async (req, res) => {
+    try {
+      const { text } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ message: "Texto é obrigatório" });
+      }
+
+      const sentiment = await analyzeSentiment(text);
+      res.json(sentiment);
+    } catch (error) {
+      res.status(500).json({ message: error.message || "Falha na análise de sentimento" });
     }
   });
 

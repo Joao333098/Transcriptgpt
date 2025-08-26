@@ -22,7 +22,12 @@ export default function Home() {
     languageCount,
     startRecording,
     stopRecording,
-    clearTranscript
+    clearTranscript,
+    switchLanguage,
+    toggleEnhancedMode,
+    currentLanguage,
+    enhancedMode,
+    detectedLanguages
   } = useSpeechRecognition();
 
   const { data: sessions = [], refetch: refetchSessions } = useQuery({
@@ -45,9 +50,13 @@ export default function Home() {
                 detectedLanguage={detectedLanguage}
                 confidence={confidence}
                 audioLevel={audioLevel}
+                currentLanguage={currentLanguage}
+                enhancedMode={enhancedMode}
                 onStartRecording={startRecording}
                 onStopRecording={stopRecording}
                 onClearTranscript={clearTranscript}
+                onSwitchLanguage={switchLanguage}
+                onToggleEnhancedMode={toggleEnhancedMode}
               />
             </div>
 

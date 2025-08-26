@@ -56,3 +56,34 @@ export function useLanguageDetection() {
     }
   });
 }
+
+export function useSentimentAnalysis() {
+  return useMutation({
+    mutationFn: async (text: string): Promise<{
+      rating: number;
+      confidence: number;
+      sentiment: string;
+    }> => {
+      const response = await apiRequest('POST', '/api/ai/sentiment', {
+        text
+      });
+      return response.json();
+    }
+  });
+}
+
+export function useTextEnhancement() {
+  return useMutation({
+    mutationFn: async ({ text, targetLanguage }: { text: string; targetLanguage?: string }): Promise<{
+      enhancedText: string;
+      corrections: string[];
+      confidence: number;
+    }> => {
+      const response = await apiRequest('POST', '/api/ai/enhance', {
+        text,
+        targetLanguage
+      });
+      return response.json();
+    }
+  });
+}

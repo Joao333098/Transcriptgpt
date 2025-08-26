@@ -1,14 +1,21 @@
-import { Mic, MicOff, Trash2 } from "lucide-react";
+import { Mic, MicOff, Trash2, Globe, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface RecordingControlsProps {
   isRecording: boolean;
   detectedLanguage: string;
   confidence: number;
   audioLevel: number;
+  currentLanguage: string;
+  enhancedMode: boolean;
   onStartRecording: () => void;
   onStopRecording: () => void;
   onClearTranscript: () => void;
+  onSwitchLanguage: (langCode: string) => void;
+  onToggleEnhancedMode: () => void;
 }
 
 export default function RecordingControls({
@@ -16,9 +23,13 @@ export default function RecordingControls({
   detectedLanguage,
   confidence,
   audioLevel,
+  currentLanguage,
+  enhancedMode,
   onStartRecording,
   onStopRecording,
-  onClearTranscript
+  onClearTranscript,
+  onSwitchLanguage,
+  onToggleEnhancedMode
 }: RecordingControlsProps) {
   return (
     <div>
@@ -93,12 +104,51 @@ export default function RecordingControls({
           </div>
         </div>
 
+        {/* Language Selection */}
+        <div className="glass-card rounded-2xl p-5 border-white/20">
+          <h3 className="text-sm font-semibold text-white mb-4 flex items-center">
+            <Globe className="w-4 h-4 mr-2" />
+            Idioma da Transcrição
+          </h3>
+          <Select value={currentLanguage} onValueChange={onSwitchLanguage}>
+            <SelectTrigger className="bg-white/20 border-white/30 text-white">
+              <SelectValue placeholder="Selecione o idioma" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pt-BR">Português (Brasil)</SelectItem>
+              <SelectItem value="en-US">English (United States)</SelectItem>
+              <SelectItem value="es-ES">Español (España)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Enhanced Mode Toggle */}
+        <div className="glass-card rounded-2xl p-5 border-white/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-white" />
+              <Label htmlFor="enhanced-mode" className="text-sm font-semibold text-white">
+                Modo Avançado IA
+              </Label>
+            </div>
+            <Switch
+              id="enhanced-mode"
+              checked={enhancedMode}
+              onCheckedChange={onToggleEnhancedMode}
+              disabled={isRecording}
+            />
+          </div>
+          <p className="text-xs text-white/70 mt-2">
+            {enhancedMode ? "Usando Gemini para melhorar a transcrição" : "Usando apenas reconhecimento básico"}
+          </p>
+        </div>
+
         {/* Clear Button */}
         <Button
           data-testid="button-clear-transcript"
           onClick={onClearTranscript}
           variant="outline"
-          className="w-full"
+          className="w-full bg-white/10 border-white/30 text-white hover:bg-white/20"
           disabled={isRecording}
         >
           <Trash2 className="w-4 h-4 mr-2" />
