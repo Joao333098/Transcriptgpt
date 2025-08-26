@@ -122,6 +122,7 @@ export function useSpeechRecognition() {
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = currentLanguage;
+    recognition.maxAlternatives = 1;
     
     recognition.onstart = () => {
       setIsRecording(true);
@@ -145,9 +146,21 @@ export function useSpeechRecognition() {
         }
       }
       
-      const fullTranscript = transcript + finalTranscript + interimTranscript;
-      setTranscript(fullTranscript);
-      updateWordCount(fullTranscript);
+      // Always preserve the existing transcript and only add new content
+      setTranscript(prevTranscript => {
+        let newTranscript = prevTranscript;
+        
+        // Add final transcript if there's new content
+        if (finalTranscript.trim()) {
+          newTranscript = prevTranscript + (prevTranscript ? ' ' : '') + finalTranscript;
+        }
+        
+        // For interim results, show them temporarily but don't persist
+        const displayTranscript = newTranscript + (interimTranscript ? ' ' + interimTranscript : '');
+        
+        updateWordCount(displayTranscript);
+        return displayTranscript;
+      });
       
       if (finalTranscript) {
         // Use AI for language detection
@@ -184,7 +197,7 @@ export function useSpeechRecognition() {
     };
     
     return recognition;
-  }, [transcript, toast, updateWordCount, detectLanguage, enhanceText, currentLanguage, enhancedMode]);
+  }, [toast, updateWordCount, detectLanguage, enhanceText, currentLanguage, enhancedMode]);
 
   const startRecording = useCallback(() => {
     try {
